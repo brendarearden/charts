@@ -6,6 +6,6 @@ version: 1.6.700
 icon: https://charts.rancher.io/assets/logos/istio.svg
 annotations:
   catalog.cattle.io/certified: rancher
-  catalog.cattle.io/namespace: istio-system
+  catalog.cattle.io/namespace: cattle-istio-system
   catalog.cattle.io/release-name: rancher-istio
   catalog.cattle.io/ui-component: istio

@@ -4,7 +4,7 @@ kind: ClusterRole
 metadata:
   labels:
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
-  namespace: istio-system
+  namespace: {{ .Values.global.istioNamespace | default "istio-system" }}
   name: istio-edit
 rules:
   - apiGroups:

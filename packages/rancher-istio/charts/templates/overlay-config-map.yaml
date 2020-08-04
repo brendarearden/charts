@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: istio-installer-overlay
-  namespace: istio-system
+  namespace: {{ .Values.global.istioNamespace | default "istio-system" }}
 data:
   overlay-config.yaml: {{ toYaml .Values.overlayFile | indent 2 }}
 {{- end }}
