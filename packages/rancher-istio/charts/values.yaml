@@ -1,4 +1,3 @@
-revision: "" # leave blank for no canary deployment, or set to given revision, eg: "1-7-2"
 overlayFile: ""
 tag: 1.6.8
 installerVersion: 0.1.6
