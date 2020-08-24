@@ -935,7 +935,7 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/tem
  {{- if or .Values.prometheus.prometheusSpec.additionalScrapeConfigs .Values.prometheus.prometheusSpec.additionalScrapeConfigsExternal }}
    additionalScrapeConfigs:
 -    name: {{ template "prometheus-operator.fullname" . }}-prometheus-scrape-confg
-+    opitional: {{ .Values.prometheus.prometheusSpec.additionalScrapeConfigs.optional }}
++    optional: {{ .Values.prometheus.prometheusSpec.additionalScrapeConfigs.optional }}
 +    name: rancher-monitoring-prometheus-scrape-confg
      key: additional-scrape-configs.yaml
  {{- end }}

@@ -206,7 +206,7 @@ spec:
 {{- end }}
 {{- if or .Values.prometheus.prometheusSpec.additionalScrapeConfigs .Values.prometheus.prometheusSpec.additionalScrapeConfigsExternal }}
   additionalScrapeConfigs:
-    opitional: {{ .Values.prometheus.prometheusSpec.additionalScrapeConfigs.optional }}
+    optional: {{ .Values.prometheus.prometheusSpec.additionalScrapeConfigs.optional }}
     name: rancher-monitoring-prometheus-scrape-confg
     key: additional-scrape-configs.yaml
 {{- end }}
