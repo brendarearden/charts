@@ -21,7 +21,7 @@ spec:
           cloud.google.com/load-balancer-type: internal
     - enabled: true
       name: other-gateway
-      namespace: cattle-istio-system
+      namespace: istio-system
       k8s:
         resources:
           requests:
