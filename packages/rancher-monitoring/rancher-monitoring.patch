@@ -1,7 +1,7 @@
 diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/Chart.yaml packages/rancher-monitoring/charts/Chart.yaml
 --- packages/rancher-monitoring/charts-original/Chart.yaml
 +++ packages/rancher-monitoring/charts/Chart.yaml
-@@ -1,22 +1,29 @@
+@@ -1,22 +1,28 @@
  apiVersion: v1
  appVersion: 0.38.1
 -description: Provides easy monitoring definitions for Kubernetes services, and deployment
@@ -11,7 +11,6 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/Cha
 +  catalog.cattle.io/namespace: cattle-monitoring-system
 +  catalog.cattle.io/release-name: rancher-monitoring
 +  catalog.cattle.io/ui-component: monitoring
-+  catalog.cattle.io/auto-install: rancher-monitoring-crd=match
 +  catalog.cattle.io/provides-gvr: monitoring.coreos.com.prometheus/v1
 +description: A Rancher chart that modifies the upstream Prometheus Operator chart, which provides easy monitoring definitions for Kubernetes services and the deployment and management of Prometheus instances, and enables Prometheus Adapter on a default Prometheus instance.
  engine: gotpl
@@ -673,7 +672,7 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/tem
 diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/templates/alertmanager/alertmanager.yaml packages/rancher-monitoring/charts/templates/alertmanager/alertmanager.yaml
 --- packages/rancher-monitoring/charts-original/templates/alertmanager/alertmanager.yaml
 +++ packages/rancher-monitoring/charts/templates/alertmanager/alertmanager.yaml
-@@ -9,7 +9,7 @@
+@@ -9,14 +9,14 @@
  {{ include "prometheus-operator.labels" . | indent 4 }}
  spec:
  {{- if .Values.alertmanager.alertmanagerSpec.image }}
@@ -682,6 +681,14 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/tem
    version: {{ .Values.alertmanager.alertmanagerSpec.image.tag }}
  {{- end }}
    replicas: {{ .Values.alertmanager.alertmanagerSpec.replicas }}
+   listenLocal: {{ .Values.alertmanager.alertmanagerSpec.listenLocal }}
+   serviceAccountName: {{ template "prometheus-operator.alertmanager.serviceAccountName" . }}
+ {{- if .Values.alertmanager.alertmanagerSpec.externalUrl }}
+-  externalUrl: "{{ .Values.alertmanager.alertmanagerSpec.externalUrl }}"
++  externalUrl: "/k8s/clusters/{{ .Values.global.cattle.clusterId }}/api/v1/namespaces/{{ .Release.Namespace }}/services/{{ .Values.alertmanager.alertmanagerSpec.externalUrl }}"
+ {{- else if and .Values.alertmanager.ingress.enabled .Values.alertmanager.ingress.hosts }}
+   externalUrl: "http://{{ index .Values.alertmanager.ingress.hosts 0 }}{{ .Values.alertmanager.alertmanagerSpec.routePrefix }}"
+ {{- else }}
 diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/templates/exporters/core-dns/servicemonitor.yaml packages/rancher-monitoring/charts/templates/exporters/core-dns/servicemonitor.yaml
 --- packages/rancher-monitoring/charts-original/templates/exporters/core-dns/servicemonitor.yaml
 +++ packages/rancher-monitoring/charts/templates/exporters/core-dns/servicemonitor.yaml
@@ -1300,7 +1307,14 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/tem
    version: {{ .Values.prometheus.prometheusSpec.image.tag }}
  {{- end }}
  {{- if .Values.prometheus.prometheusSpec.externalLabels }}
-@@ -56,6 +56,9 @@
+@@ -50,12 +50,15 @@
+   replicaExternalLabelName: "{{ .Values.prometheus.prometheusSpec.replicaExternalLabelName }}"
+ {{- end }}
+ {{- if .Values.prometheus.prometheusSpec.externalUrl }}
+-  externalUrl: "{{ tpl .Values.prometheus.prometheusSpec.externalUrl . }}"
++  externalUrl: "/k8s/clusters/{{ .Values.global.cattle.clusterId }}/api/v1/namespaces/{{ .Release.Namespace }}/services/{{ tpl .Values.prometheus.prometheusSpec.externalUrl . }}"
+ {{- else if and .Values.prometheus.ingress.enabled .Values.prometheus.ingress.hosts }}
+   externalUrl: "http://{{ tpl (index .Values.prometheus.ingress.hosts 0) . }}{{ .Values.prometheus.prometheusSpec.routePrefix }}"
  {{- else }}
    externalUrl: http://{{ template "prometheus-operator.fullname" . }}-prometheus.{{ template "prometheus-operator.namespace" . }}:{{ .Values.prometheus.service.port }}
  {{- end }}
@@ -2183,6 +2197,15 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/val
        tag: v0.20.0
  
      ## If true then the user will be responsible to provide a secret with alertmanager configuration
+@@ -390,7 +727,7 @@
+ 
+     ## 	The external URL the Alertmanager instances will be available under. This is necessary to generate correct URLs. This is necessary if Alertmanager is not served from root of a DNS name.	string	false
+     ##
+-    externalUrl:
++    externalUrl: http://rancher-monitoring-prometheus.cattle-monitoring-system.svc:9090/prometheus/
+ 
+     ## 	The route prefix Alertmanager registers HTTP handlers for. This is useful, if using ExternalURL and a proxy is rewriting HTTP routes of a request, and the actual ExternalURL is still true,
+     ## but the server serves requests under a different route prefix. For example for use with kubectl proxy.
 @@ -409,9 +746,13 @@
      ## Define resources requests and limits for single Pods.
      ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
@@ -2414,18 +2437,20 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/val
        tag: v2.18.1
  
      ## Tolerations for use with node taints
-@@ -1628,6 +2005,11 @@
-     ##
-     externalUrl: ""
+@@ -1626,7 +2003,12 @@
  
+     ## External URL at which Prometheus will be reachable.
+     ##
+-    externalUrl: ""
++    externalUrl: http://rancher-monitoring-prometheus.cattle-monitoring-system.svc:9090/prometheus/
++
 +    ## Ignore NamespaceSelector settings from the PodMonitor and ServiceMonitor configs
 +    ## If true, PodMonitors and ServiceMonitors can only discover Pods and Services within the namespace they are deployed into
 +    ##
 +    ignoreNamespaceSelectors: true
-+
+ 
      ## Define which Nodes the Pods are scheduled on.
      ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-     ##
 @@ -1660,7 +2042,7 @@
      ## prometheus resource to be created with selectors based on values in the helm deployment,
      ## which will also match the PrometheusRule resources created
