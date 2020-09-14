@@ -276,7 +276,7 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/cha
 diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/charts/grafana/templates/_helpers.tpl packages/rancher-monitoring/charts/charts/grafana/templates/_helpers.tpl
 --- packages/rancher-monitoring/charts-original/charts/grafana/templates/_helpers.tpl
 +++ packages/rancher-monitoring/charts/charts/grafana/templates/_helpers.tpl
-@@ -80,3 +80,16 @@
+@@ -80,3 +80,15 @@
  app.kubernetes.io/name: {{ include "grafana.name" . }}
  app.kubernetes.io/instance: {{ .Release.Name }}
  {{- end -}}
@@ -290,7 +290,6 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/cha
 +{{- else -}}
 +{{- $proxyURLFmt := "http://%s-grafana.%s:%.0f" -}}
 +{{- printf $proxyURLFmt (include "grafana.fullname" .) (include "grafana.namespace" .) .Values.grafana.service.port -}}
-+{{- end -}}
 +{{- end -}}
 +{{- end -}}
 \ No newline at end of file
@@ -345,25 +344,15 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/cha
 diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/charts/grafana/templates/configmap.yaml packages/rancher-monitoring/charts/charts/grafana/templates/configmap.yaml
 --- packages/rancher-monitoring/charts-original/charts/grafana/templates/configmap.yaml
 +++ packages/rancher-monitoring/charts/charts/grafana/templates/configmap.yaml
-@@ -10,8 +10,18 @@
-   plugins: {{ join "," .Values.plugins }}
- {{- end }}
-   grafana.ini: |
-+{{- $root := . -}}
-+{{- if and .Values.global.cattle (index .Values "grafana.ini") -}}
-+{{- if not (hasKey (index .Values "grafana.ini") "server")}}
-+    [server]
-+    root_url = {{ template "grafana_proxy_url" $root }}
-+{{- end }}
-+{{- end }}
- {{- range $key, $value := index .Values "grafana.ini" }}
-     [{{ $key }}]
-+    {{- if and $root.Values.global.cattle (eq $key "server") (not (hasKey $value "root_url")) }}
-+    root_url = {{ template "grafana_proxy_url" $root }}
-+    {{- end }}
-     {{- range $elem, $elemVal := $value }}
+@@ -16,6 +16,8 @@
      {{ $elem }} = {{ $elemVal }}
      {{- end }}
+ {{- end }}
++    root_url = {{ template "grafana_proxy_url" . }}
++    serve_from_sub_path = true
+ 
+ {{- if .Values.datasources }}
+ {{ $root := . }}
 diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/charts/grafana/values.yaml packages/rancher-monitoring/charts/charts/grafana/values.yaml
 --- packages/rancher-monitoring/charts-original/charts/grafana/values.yaml
 +++ packages/rancher-monitoring/charts/charts/grafana/values.yaml
@@ -2352,12 +2341,14 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/val
  
  ## Provide a k8s version to auto dashboard import script example: kubeTargetVersionOverride: 1.16.6
  ##
-@@ -76,8 +334,19 @@
+@@ -76,8 +334,21 @@
  
  ##
  global:
 +  cattle:
 +    systemDefaultRegistry: ""
++    url: ""
++    clusterId: ""
    rbac:
 +    ## Create RBAC resources for ServiceAccounts and users 
 +    ##
@@ -2372,7 +2363,7 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/val
      pspEnabled: true
      pspAnnotations: {}
        ## Specify pod annotations
-@@ -130,6 +399,22 @@
+@@ -130,6 +401,22 @@
    ## ref: https://prometheus.io/docs/alerting/configuration/#configuration-file
    ##      https://prometheus.io/webtools/alerting/routing-tree-editor/
    ##
@@ -2395,7 +2386,7 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/val
    config:
      global:
        resolve_timeout: 5m
-@@ -145,6 +430,8 @@
+@@ -145,6 +432,8 @@
          receiver: 'null'
      receivers:
      - name: 'null'
@@ -2404,7 +2395,7 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/val
  
    ## Pass the Alertmanager configuration directives through Helm's templating
    ## engine. If the Alertmanager configuration contains Alertmanager templates,
-@@ -160,25 +447,76 @@
+@@ -160,25 +449,76 @@
    ## ref: https://prometheus.io/docs/alerting/notifications/
    ##      https://prometheus.io/docs/alerting/notification_examples/
    ##
