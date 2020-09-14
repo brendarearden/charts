@@ -1,0 +1,9 @@
+diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-operator/charts-original/Chart.yaml packages/rancher-operator/charts/Chart.yaml
+--- packages/rancher-operator/charts-original/Chart.yaml
++++ packages/rancher-operator/charts/Chart.yaml
+@@ -10,4 +10,4 @@
+ appVersion: 0.1.0-alpha3
+ description: Control Rancher using GitOps
+ name: rancher-operator
+-version: 0.1.0-alpha3
++version: 0.1.0-alpha300

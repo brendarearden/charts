@@ -276,21 +276,16 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/cha
 diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/charts/grafana/templates/_helpers.tpl packages/rancher-monitoring/charts/charts/grafana/templates/_helpers.tpl
 --- packages/rancher-monitoring/charts-original/charts/grafana/templates/_helpers.tpl
 +++ packages/rancher-monitoring/charts/charts/grafana/templates/_helpers.tpl
-@@ -80,3 +80,15 @@
+@@ -80,3 +80,10 @@
  app.kubernetes.io/name: {{ include "grafana.name" . }}
  app.kubernetes.io/instance: {{ .Release.Name }}
  {{- end -}}
 +
 +{{- define "grafana_proxy_url" -}}
-+{{- if .Values.global.cattle -}}
 +{{- $url := required "Rancher URL required to construct proxy URL" .Values.global.cattle.url -}}
 +{{- $clusterId := required "Rancher Cluster ID required to construct proxy URL" .Values.global.cattle.clusterId -}}
 +{{- $proxyURLFmt := "%s/k8s/clusters/%s/api/v1/namespaces/%s/services/http:%s:%.0f/proxy" -}}
 +{{- printf $proxyURLFmt $url $clusterId (include "grafana.namespace" .) (include "grafana.fullname" .) .Values.service.port -}}
-+{{- else -}}
-+{{- $proxyURLFmt := "http://%s-grafana.%s:%.0f" -}}
-+{{- printf $proxyURLFmt (include "grafana.fullname" .) (include "grafana.namespace" .) .Values.grafana.service.port -}}
-+{{- end -}}
 +{{- end -}}
 \ No newline at end of file
 diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/charts/grafana/templates/_pod.tpl packages/rancher-monitoring/charts/charts/grafana/templates/_pod.tpl
@@ -382,17 +377,19 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/cha
      tag: "1.31.1"
      pullPolicy: IfNotPresent
  
-@@ -405,6 +405,9 @@
+@@ -405,6 +405,11 @@
      mode: console
    grafana_net:
      url: https://grafana.net
 +  server:
++    domain: https://brendar.do.rancher.space/
 +    root_url: /api/v1/namespaces/cattle-monitoring-system/services/http:rancher-monitoring-grafana:80/proxy
 +    serve_from_sub_path: true
++    enforce_domain: true
  ## grafana Authentication can be enabled with the following values on grafana.ini
   # server:
        # The full public facing url you use in browser, used for redirects and emails
-@@ -465,7 +468,7 @@
+@@ -465,7 +470,7 @@
  ## Requires at least Grafana 5 to work and can't be used together with parameters dashboardProviders, datasources and dashboards
  sidecar:
    image:
@@ -735,34 +732,24 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/tem
  {{/* vim: set filetype=mustache: */}}
  {{/* Expand the name of the chart. This is suffixed with -alertmanager, which means subtract 13 from longest 63 available */}}
  {{- define "prometheus-operator.name" -}}
-@@ -90,4 +124,28 @@
+@@ -90,4 +124,18 @@
    {{- else -}}
      {{- .Release.Namespace -}}
    {{- end -}}
 +{{- end -}}
 +
 +{{- define "prometheus_proxy_url" -}}
-+{{- if .Values.global.cattle -}}
-+{{- $url := required "Rancher URL required to construct proxy URL" .Values.global.cattle.url -}}
++{{- $url := "https://brendar.do.rancher.space" -}}
 +{{- $clusterId := required "Rancher Cluster ID required to construct proxy URL" .Values.global.cattle.clusterId -}}
 +{{- $proxyURLFmt := "%s/k8s/clusters/%s/api/v1/namespaces/%s/services/http:%s-prometheus:%.0f/proxy" -}}
 +{{- printf $proxyURLFmt $url $clusterId (include "prometheus-operator.namespace" .) (include "prometheus-operator.fullname" .) .Values.prometheus.service.port -}}
-+{{- else -}}
-+{{- $proxyURLFmt := "http://%s-prometheus.%s:%.0f" -}}
-+{{- printf $proxyURLFmt (include "prometheus-operator.fullname" .) (include "prometheus-operator.namespace" .) .Values.prometheus.service.port -}}
-+{{- end -}}
 +{{- end -}}
 +
 +{{- define "alertmanager_proxy_url" -}}
-+{{- if .Values.global.cattle -}}
-+{{- $url := required "Rancher URL required to construct proxy URL" .Values.global.cattle.url -}}
++{{- $url := "https://brendar.do.rancher.space" -}}
 +{{- $clusterId := required "Rancher Cluster ID required to construct proxy URL" .Values.global.cattle.clusterId -}}
 +{{- $proxyURLFmt := "%s/k8s/clusters/%s/api/v1/namespaces/%s/services/http:%s-alertmanager:%.0f/proxy" -}}
 +{{- printf $proxyURLFmt $url $clusterId (include "prometheus-operator.namespace" .) (include "prometheus-operator.fullname" .) .Values.alertmanager.service.port -}}
-+{{- else -}}
-+{{- $proxyURLFmt := "http://%s-alertmanager.%s:%.0f" -}}
-+{{- printf $proxyURLFmt (include "prometheus-operator.fullname" .) (include "prometheus-operator.namespace" .) .Values.prometheus.service.port -}}
-+{{- end -}}
  {{- end -}}
 \ No newline at end of file
 diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/templates/alertmanager/alertmanager.yaml packages/rancher-monitoring/charts/templates/alertmanager/alertmanager.yaml
@@ -992,6 +979,15 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/tem
  {{- end }}
  {{- if .Values.alertmanager.alertmanagerSpec.nodeSelector }}
    nodeSelector:
+@@ -46,7 +46,7 @@
+ {{ toYaml .Values.alertmanager.alertmanagerSpec.resources | indent 4 }}
+ {{- end }}
+ {{- if .Values.alertmanager.alertmanagerSpec.routePrefix }}
+-  routePrefix: "{{ .Values.alertmanager.alertmanagerSpec.routePrefix }}"
++  routePrefix: "{{ template "alertmanager_proxy_url" . }}"
+ {{- end }}
+ {{- if .Values.alertmanager.alertmanagerSpec.securityContext }}
+   securityContext:
 diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/templates/exporters/core-dns/servicemonitor.yaml packages/rancher-monitoring/charts/templates/exporters/core-dns/servicemonitor.yaml
 --- packages/rancher-monitoring/charts-original/templates/exporters/core-dns/servicemonitor.yaml
 +++ packages/rancher-monitoring/charts/templates/exporters/core-dns/servicemonitor.yaml
@@ -1622,6 +1618,15 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/tem
  {{- end }}
  {{- if .Values.prometheus.prometheusSpec.nodeSelector }}
    nodeSelector:
+@@ -84,7 +87,7 @@
+   walCompression: {{ .Values.prometheus.prometheusSpec.walCompression }}
+ {{- end }}
+ {{- if .Values.prometheus.prometheusSpec.routePrefix }}
+-  routePrefix: {{ .Values.prometheus.prometheusSpec.routePrefix | quote  }}
++  routePrefix: "{{ template "prometheus_proxy_url" . }}"
+ {{- end }}
+ {{- if .Values.prometheus.prometheusSpec.secrets }}
+   secrets:
 diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-monitoring/charts-original/templates/prometheus/rules/etcd.yaml packages/rancher-monitoring/charts/templates/prometheus/rules/etcd.yaml
 --- packages/rancher-monitoring/charts-original/templates/prometheus/rules/etcd.yaml
 +++ packages/rancher-monitoring/charts/templates/prometheus/rules/etcd.yaml
