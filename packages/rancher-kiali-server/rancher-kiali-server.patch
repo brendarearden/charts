@@ -57,7 +57,21 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-kiali-server/charts-original/t
  {{- end }}
  {{- end }}
  
-@@ -170,3 +166,11 @@
+@@ -101,11 +97,8 @@
+ {{- if .Values.server.web_root  }}
+   {{- .Values.server.web_root | trimSuffix "/" }}
+ {{- else }}
+-  {{- if .Capabilities.APIVersions.Has "route.openshift.io/v1" }}
+-    {{- "/" }}
+-  {{- else }}
+-    {{- "/kiali" }}
+-  {{- end }}
++  {{- "/" }}
++{{- end }}
+ {{- end }}
+ {{- end }}
+ 
+@@ -170,3 +163,11 @@
    {{- end }}
  {{- end }}
  {{- end }}
@@ -127,6 +141,14 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-kiali-server/charts-original/t
 diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-kiali-server/charts-original/values.yaml packages/rancher-kiali-server/charts/values.yaml
 --- packages/rancher-kiali-server/charts-original/values.yaml
 +++ packages/rancher-kiali-server/charts/values.yaml
+@@ -1,5 +1,5 @@
+-nameOverride: "kiali"
+-fullnameOverride: "kiali"
++nameOverride: "rancher-istio-kiali"
++fullnameOverride: "rancher-istio-kiali"
+ 
+ # This is required for "openshift" auth strategy.
+ # You have to know ahead of time what your Route URL will be because
 @@ -9,6 +9,9 @@
  # do this, a PR would be welcome.
  kiali_route_url: ""
