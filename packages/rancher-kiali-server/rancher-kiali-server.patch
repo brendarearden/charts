@@ -57,7 +57,21 @@ diff -x '*.tgz' -x '*.lock' -uNr packages/rancher-kiali-server/charts-original/t
  {{- end }}
  {{- end }}
  
-@@ -170,3 +166,11 @@
+@@ -101,11 +97,8 @@
+ {{- if .Values.server.web_root  }}
+   {{- .Values.server.web_root | trimSuffix "/" }}
+ {{- else }}
+-  {{- if .Capabilities.APIVersions.Has "route.openshift.io/v1" }}
+-    {{- "/" }}
+-  {{- else }}
+-    {{- "/kiali" }}
+-  {{- end }}
++  {{- "/" }}
++{{- end }}
+ {{- end }}
+ {{- end }}
+ 
+@@ -170,3 +163,11 @@
    {{- end }}
  {{- end }}
  {{- end }}
