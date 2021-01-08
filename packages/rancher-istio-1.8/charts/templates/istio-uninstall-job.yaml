@@ -39,4 +39,9 @@ spec:
             name: istio-installer-overlay
         {{ end }}
       serviceAccountName: istio-installer
+      {{- if .Values.global.rbac.psp.enabled }}
+      securityContext:
+        runAsUser: 101
+        runAsGroup: 101
+      {{- end  }}
       restartPolicy: OnFailure

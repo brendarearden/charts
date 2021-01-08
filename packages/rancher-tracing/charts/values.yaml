@@ -40,3 +40,8 @@ service:
   name: http-query
   type: ClusterIP
   externalPort: 16686
+
+  rbac:
+    psp:
+      enabled: true
+      

@@ -23,10 +23,14 @@
    ingress_enabled: true
    logger:
      log_format: "text"
-@@ -78,3 +81,11 @@
+@@ -78,3 +81,15 @@
    metrics_enabled: true
    metrics_port: 9090
    web_root: ""
++
++rbac:
++  psp:
++    enabled: true
 +
 +# Common settings used among istio subcharts.
 +global:

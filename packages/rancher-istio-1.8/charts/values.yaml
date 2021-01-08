@@ -60,6 +60,9 @@ global:
     tag: 1.8.3
   defaultPodDisruptionBudget:
     enabled: true
+  rbac:
+    psp:
+      enabled: true
 
 # this can be removed in 1.7 as it is default
 meshConfig:
@@ -83,10 +86,16 @@ kiali:
     grafana:
       in_cluster_url: "http://rancher-monitoring-grafana.cattle-monitoring-system.svc:80"
       url: "http://rancher-monitoring-grafana.cattle-monitoring-system.svc:80"
+  rbac:
+    psp:
+      enabled: true
 
 tracing:
-  enabled: false
+  enabled: true
   contextPath: "/jaeger"
   jaeger:
     repository: rancher/mirrored-jaegertracing-all-in-one
     tag: 1.20.0
+  rbac:
+    psp:
+      enabled: true

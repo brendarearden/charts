@@ -68,6 +68,12 @@ spec:
       affinity:
       {{- include "nodeAffinity" . | indent 6 }}
       {{- include "podAntiAffinity" . | indent 6 }}
+      {{- if .Values.rbac.psp.enabled }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      {{- end }}
+      serviceAccountName: {{ include "tracing.fullname" . }}
 {{- if eq .Values.jaeger.spanStorageType "badger" }}
       volumes:
       - name: data
