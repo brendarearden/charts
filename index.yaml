@@ -421,7 +421,7 @@ entries:
   - annotations:
       catalog.cattle.io/auto-install: rancher-logging-crd=match
       catalog.cattle.io/certified: rancher
-      catalog.cattle.io/display-name: Logging
+      catalog.cattle.io/display-name: Logging-brenda
       catalog.cattle.io/namespace: cattle-logging-system
       catalog.cattle.io/os: linux
       catalog.cattle.io/provides-gvr: logging.banzaicloud.io.clusterflow/v1beta1
@@ -438,7 +438,7 @@ entries:
     - logging
     - monitoring
     - security
-    name: rancher-logging
+    name: rancher-brenda
     urls:
     - assets/rancher-logging/rancher-logging-3.9.000-rc01.tgz
     version: 3.9.000-rc01
