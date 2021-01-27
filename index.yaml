@@ -417,7 +417,7 @@ entries:
     urls:
     - assets/rancher-kiali-server-1.29/rancher-kiali-server-crd-1.24.000-rc00.tgz
     version: 1.24.000-rc00
-  rancher-logging:
+  rancher-brenda:
   - annotations:
       catalog.cattle.io/auto-install: rancher-logging-crd=match
       catalog.cattle.io/certified: rancher
