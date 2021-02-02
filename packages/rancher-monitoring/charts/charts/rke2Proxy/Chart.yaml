@@ -1,0 +1,22 @@
+name: rke2Proxy
+home: ""
+sources: []
+version: 0.1.2
+description: Sets up a deployment of the PushProx proxy and a DaemonSet of PushProx
+  clients.
+keywords: []
+maintainers: []
+icon: ""
+apiversion: v1
+condition: ""
+tags: ""
+appversion: 0.1.0
+deprecated: false
+annotations:
+  catalog.cattle.io/hidden: "true"
+  catalog.rancher.io/certified: rancher
+  catalog.rancher.io/namespace: cattle-monitoring-system
+  catalog.rancher.io/release-name: rancher-pushprox
+kubeversion: ""
+dependencies: []
+type: application
