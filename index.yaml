@@ -225,7 +225,7 @@ entries:
       catalog.cattle.io/certified: rancher
       catalog.cattle.io/namespace: istio-system
       catalog.cattle.io/provides-gvr: networking.istio.io.virtualservice/v1beta1
-      catalog.cattle.io/rancher-version: ~2.6.0
+      catalog.cattle.io/rancher-version: ~ 2.6.0
       catalog.cattle.io/release-name: rancher-istio
       catalog.cattle.io/requires-gvr: monitoring.coreos.com.prometheus/v1
       catalog.cattle.io/ui-component: istio
@@ -283,7 +283,7 @@ entries:
       catalog.cattle.io/certified: rancher
       catalog.cattle.io/namespace: istio-system
       catalog.cattle.io/provides-gvr: networking.istio.io.virtualservice/v1beta1
-      catalog.cattle.io/rancher-version: '>=2.5.0-alpha, <2.6.0'
+      catalog.cattle.io/rancher-version: '>= 2.5.0-alpha <2.6.0'
       catalog.cattle.io/release-name: rancher-istio
       catalog.cattle.io/requires-gvr: monitoring.coreos.com.prometheus/v1
       catalog.cattle.io/ui-component: istio
@@ -312,7 +312,7 @@ entries:
       catalog.cattle.io/certified: rancher
       catalog.cattle.io/namespace: istio-system
       catalog.cattle.io/provides-gvr: networking.istio.io.virtualservice/v1beta1
-      catalog.cattle.io/rancher-version: '>=2.4.1-alpha, <2.5.2'
+      catalog.cattle.io/rancher-version: '>= 2.4.1-alpha < 2.5.8'
       catalog.cattle.io/release-name: rancher-istio
       catalog.cattle.io/requires-gvr: monitoring.coreos.com.prometheus/v1
       catalog.cattle.io/ui-component: istio
@@ -340,7 +340,7 @@ entries:
       catalog.cattle.io/auto-install: rancher-kiali-server-crd=1.23.001
       catalog.cattle.io/certified: rancher
       catalog.cattle.io/namespace: istio-system
-      catalog.cattle.io/rancher-version: '>=2.4.3'
+      catalog.cattle.io/rancher-version: '>= 2.4.3'
       catalog.cattle.io/provides-gvr: networking.istio.io.virtualservice/v1beta1
       catalog.cattle.io/release-name: rancher-istio
       catalog.cattle.io/requires-gvr: monitoring.coreos.com.prometheus/v1
@@ -371,6 +371,7 @@ entries:
       catalog.cattle.io/namespace: istio-system
       catalog.cattle.io/provides-gvr: networking.istio.io.virtualservice/v1beta1
       catalog.cattle.io/release-name: rancher-istio
+      catalog.cattle.io/rancher-version: '>= 2.4.1 < 2.5.7'
       catalog.cattle.io/requires-gvr: monitoring.coreos.com.prometheus/v1
       catalog.cattle.io/ui-component: istio
     apiVersion: v1
@@ -392,7 +393,7 @@ entries:
     name: rancher-istio
     urls:
     - rancher-istio/rancher-istio-1.7.3.tgz
-    version: 1.7.101
+    version: 1.7.102
   - annotations:
       catalog.cattle.io/auto-install: rancher-kiali-server-crd=1.23.001
       catalog.cattle.io/certified: rancher
@@ -420,7 +421,7 @@ entries:
     name: rancher-istio
     urls:
     - rancher-istio/rancher-istio-1.7.1.tgz
-    version: 1.7.100
+    version: 1.7.103
   rancher-kiali-server:
   - annotations:
       catalog.cattle.io/auto-install: rancher-kiali-server-crd=match
