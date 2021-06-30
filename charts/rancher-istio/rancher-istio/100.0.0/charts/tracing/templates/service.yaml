@@ -13,6 +13,7 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   type: {{ .Values.service.type }}
+  clusterIPs: ""
   ports:
     - name: {{ .Values.service.name }}
       port: {{ .Values.service.externalPort }}
@@ -32,6 +33,8 @@ metadata:
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
 spec:
+  type: ClusterIP
+  clusterIPs: ""
   ports:
     - name: {{ .Values.service.name }}
       port: {{ .Values.zipkin.queryPort }}
@@ -50,6 +53,7 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   type: ClusterIP
+  clusterIPs: ""
   ports:
   - name: jaeger-collector-http
     port: 14268
