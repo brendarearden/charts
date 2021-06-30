@@ -1,0 +1,12 @@
+--- charts-original/templates/service.yaml
++++ charts/templates/service.yaml
+@@ -23,6 +23,9 @@
+ spec:
+   {{- if .Values.deployment.service_type }}
+   type: {{ .Values.deployment.service_type }}
++  {{- if (eq .Values.deployment.service_type "ClusterIP") }}
++  clusterIP: ""
++  {{- end }}
+   {{- end }}
+   ports:
+   {{- if (include "kiali-server.identity.cert_file" .) }}
