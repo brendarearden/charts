@@ -13,9 +13,7 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   type: {{ .Values.service.type }}
-  {{- if (eq .Values.service.type "ClusterIP") }}
-  clusterIP: ""
-  {{- end }}
+  clusterIPs: ""
   ports:
     - name: {{ .Values.service.name }}
       port: {{ .Values.service.externalPort }}
@@ -36,7 +34,7 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   type: ClusterIP
-  clusterIP: ""
+  clusterIPs: ""
   ports:
     - name: {{ .Values.service.name }}
       port: {{ .Values.zipkin.queryPort }}
@@ -55,7 +53,7 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   type: ClusterIP
-  clusterIP: ""
+  clusterIPs: ""
   ports:
   - name: jaeger-collector-http
     port: 14268
