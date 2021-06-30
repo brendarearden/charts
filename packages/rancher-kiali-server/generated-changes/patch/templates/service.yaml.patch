@@ -4,7 +4,7 @@
    {{- if .Values.deployment.service_type }}
    type: {{ .Values.deployment.service_type }}
    {{- end }}
-+  clusterIPs: ""
++  clusterIPs: []
    ports:
    {{- if (include "kiali-server.identity.cert_file" .) }}
    - name: tcp
